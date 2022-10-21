@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.callbacks import LambdaCallback, ModelCheckpoint
-from tensorflow.keras.layers import InputLayer, Input, Dense, TimeDistributed, LSTM, RepeatVector, Dropout, GRU, CuDNNLSTM, Activation
+from tensorflow.keras.layers import InputLayer, Input, Dense, TimeDistributed, LSTM, RepeatVector, Dropout, GRU, Activation
 from tensorflow.keras.models import Model, Sequential, load_model
 from tensorflow.keras import regularizers
 from tensorflow.keras.datasets import mnist
@@ -9,7 +9,7 @@ from tensorflow.keras import utils as np_utils
 from tensorflow.keras.callbacks import TensorBoard
 
 
-#generator 
+#generator
 from tensorflow.keras.utils import Sequence
 
 import argparse
@@ -24,29 +24,29 @@ from datetime import datetime
 import time
 import re
 
-import get_data as gd
+# import get_data as gd
 import models as my_models
 
 # folder_path = "/media/datadisk/imim/existential_crisis/latest_data"
 
 #helpful functions
-def load_onoffset_dicts():
-    #load dictionaries
+# def load_onoffset_dicts():
+#     #load dictionaries
+#
+#     dict_path_onsets = "/media/datadisk/imim/existential_crisis/latest_data/exp5/parts/part_onsets_in_clean_aggr.pkl"
+#     dict_onsets = np.load(dict_path_onsets,allow_pickle=True)
+#
+#     dict_path_offsets = "/media/datadisk/imim/existential_crisis/latest_data/exp5/parts/part_offsets_in_clean_aggr.pkl"
+#     dict_offsets = np.load(dict_path_offsets,allow_pickle=True)
+#
+#     return dict_onsets, dict_offsets
 
-    dict_path_onsets = "/media/datadisk/imim/existential_crisis/latest_data/exp5/parts/part_onsets_in_clean_aggr.pkl"
-    dict_onsets = np.load(dict_path_onsets,allow_pickle=True)
 
-    dict_path_offsets = "/media/datadisk/imim/existential_crisis/latest_data/exp5/parts/part_offsets_in_clean_aggr.pkl"
-    dict_offsets = np.load(dict_path_offsets,allow_pickle=True)
-
-    return dict_onsets, dict_offsets
-
-
-def load_harmony_dictionaries(dict_folder_path="/media/datadisk/imim/existential_crisis/latest_data/exp5/parts", dict_prefix="parts"):
+def load_harmony_dictionaries(dict_folder_path="harmonies/", dict_prefix="parts"):
 
     d_chord2int_path = dict_folder_path + os.sep + dict_prefix + "_harmony_chord2int_dict.pkl"
     d_int2chord_path = dict_folder_path + os.sep + dict_prefix + "_harmony_int2chord_dict.pkl"
-    
+
     d_chord2int = np.load(d_chord2int_path, allow_pickle=True)
     d_int2chord = np.load(d_int2chord_path, allow_pickle=True)
 
@@ -58,7 +58,7 @@ def load_harmony_dictionaries(dict_folder_path="/media/datadisk/imim/existential
 def save_databrick(databrick,folder_path,filename,extension):
     dash_list = ["-" for i in range(len(filename)+20)]
     dash_list = "".join(dash_list)
-    
+
     print("\n"+str(dash_list))
     print(filename,databrick.shape)
     print(dash_list)
@@ -76,7 +76,7 @@ def create_parts_list(args, validation_per):
     #in case of training on already trained model, to keep the same id's for training and validation
     if os.path.exists(path_of_lists):
         lists = np.load(path_of_lists)
-        
+
         parts_for_training = lists[lists.files[0]]
         # parts_for_training = parts_for_training.tolist()
         print(parts_for_training)
@@ -87,38 +87,40 @@ def create_parts_list(args, validation_per):
 
         # exit()
     else:
-        dict_onsets, dict_offsets = load_onoffset_dicts()
+        # Testing without dictionaries!
+
+        # dict_onsets, dict_offsets = load_onoffset_dicts()
 
         #total number of parts(original pitch + transpositions)
-        original_pitch_parts = len(dict_onsets)
+        original_pitch_parts = 4430
         # print(original_pitch_parts)
-        tot_parts = len(dict_onsets)* 12
+        tot_parts = original_pitch_parts * 12
 
         parts_for_training = [ i+1 for i in range(tot_parts)]
         # print(parts_for_training,len(parts_for_training),)
-        
+
         parts_for_validation = [ ]
 
         val_parts_num = int(np.floor( validation_per * tot_parts ))
         val_parts_from_each_pitch = int(val_parts_num/12)
-        
+
 
         #randomly select the parts for validation
         random.seed(datetime.now())
         for i in range(12):
             print("\nPitch ", str(i+1))
             print(i*original_pitch_parts+1,i*original_pitch_parts+original_pitch_parts)
-            rand_parts_for_val = random.sample(range(i*original_pitch_parts+1,i*original_pitch_parts+original_pitch_parts), val_parts_from_each_pitch) 
+            rand_parts_for_val = random.sample(range(i*original_pitch_parts+1,i*original_pitch_parts+original_pitch_parts), val_parts_from_each_pitch)
             # print(rand_parts_for_val,len(rand_parts_for_val))
 
             #add part to the validation parts list
             parts_for_validation.extend(rand_parts_for_val)
-            
+
             #delete part from training parts list
             # print(len(parts_for_training))
             parts_for_training = set(parts_for_training) - set(rand_parts_for_val)
             # print(len(parts_for_training))
-            
+
 
         print("")
         print(len(parts_for_training),len(parts_for_validation))
@@ -128,7 +130,7 @@ def create_parts_list(args, validation_per):
         # parts_for_training =[ i+1 for i in parts_for_training ]
         # path_of_lists = folder_path + "/exp5/parts/train_val_id_list.npz"
         np.savez(path_of_lists, parts_for_training=parts_for_training, parts_for_validation=parts_for_validation)
-        
+
 
     return parts_for_training, parts_for_validation
 
@@ -138,8 +140,8 @@ class DataGenerator(Sequence):
     """Generates data for Keras
     Sequence based data generator. Suitable for building data generator for training and prediction.
     """
-    def __init__(self, list_IDs, features=20, dim = (16, 20), n_classes = 129, shuffle=False, model_type="human20", step_len=1, past_window_len = 16, to_fit=True, batch_size=128, samples_path="/media/datadisk/imim/existential_crisis/latest_data/exp5/parts/samples"):
-        
+    def __init__(self, list_IDs, features=20, dim = (16, 20), n_classes = 129, shuffle=False, model_type="human20", step_len=1, past_window_len = 16, to_fit=True, batch_size=128, samples_path="samples"):
+
         """Initialization
         :param list_IDs: list of all parts to use in the generator
         :param to_fit: True to return X and y, False to return X only
@@ -190,15 +192,15 @@ class DataGenerator(Sequence):
             # Generate data
             if self.model_type == "human20":
                 X, y = self.human_input_batch(part_id)
-                return X, y 
-        
+                return X, y
+
             elif self.model_type == "bot21":
                 X, y = self.bot_input_batch(part_id)
                 return X, y
-        
+
         # else: #NOTE ???!?!?!
 
-           
+
     def on_epoch_end(self):
         """Updates indexes after each epoch
         """
@@ -208,7 +210,7 @@ class DataGenerator(Sequence):
 
         # print(self.indexes)
 
-    
+
     # "brings" beat's and chord_info's future to present, by 1 timestep
     def shift_beat_ch_info(self, databrick, beat_offset, beat_size, ch_info_offset, ch_info_size):
 
@@ -244,13 +246,13 @@ class DataGenerator(Sequence):
     def delete_feature(self, data_brick,feat_offset,feat_size):
 
         data_brick_no_feature = np.vstack((data_brick[:feat_offset,:],data_brick[feat_offset+feat_size:,:]))
-        
+
         return data_brick_no_feature
 
 
     #creates 1 batch of input for the human model (shifted num_of_samples samples)
     def human_input_batch(self, part_id):
-        
+
         part_path = self.samples_path + os.sep + "part" + str(part_id) + os.sep + "part" + str(part_id) + ".npz"
 
         part_brick = np.load(part_path)
@@ -284,7 +286,7 @@ class DataGenerator(Sequence):
             y[i] = part_brick[feature_to_classify_offset:feature_to_classify_offset+feature_to_classify_size,i+self.past_window_len]
             # print(int(train_y[i]))
 
-        
+
         y = np_utils.to_categorical(y, num_classes=self.n_classes, dtype="float32")
 
         return x, y
@@ -338,8 +340,9 @@ def train_model(args,version="parts"):
 
     ids_for_training, ids_for_validation = create_parts_list(args, args.validation_per)
     print(len(ids_for_training), len(ids_for_validation))
+    print(args.model_type)
     # exit()
-    
+
     if args.load is not "none":
         result = re.search('ep(.*)-acc', args.load)
         epochs_so_far = result.group(1)
@@ -354,7 +357,7 @@ def train_model(args,version="parts"):
                 model = load_model(args.load)
             else:
                 print("\nWRONG MODEL!!\n")
-                exit()    
+                exit()
         else:
             model = my_models.model(args.past_window_len,feature_rows,args.class_num,args.units)
 
@@ -374,14 +377,14 @@ def train_model(args,version="parts"):
             model = my_models.model_bot(args.past_window_len,feature_rows,args.class_num,args.units)
 
 
-    
+
 
     model_path = args.saved_models_folder + os.sep + version + "_model_"+args.model_type+"_"+str(args.past_window_len)+"len_ep{epoch:02d}-acc{val_acc:.4f}-loss{val_loss:.4f}-units"+str(args.units)+"_prevEp"+str(epochs_so_far)+".h5"
-    
+
     print_callback = ModelCheckpoint(model_path, monitor='val_loss', save_best_only=True )
-    
+
     tensorboard = TensorBoard(log_dir='logs/{}'.format(time.time()))
-    #new log dir!!! 
+    #new log dir!!!
     # /media/datadisk/imim/existential_crisis/latest_data/exp5/parts/
 
     training_generator = DataGenerator(ids_for_training, model_type=args.model_type, dim=(args.past_window_len, feature_rows), n_classes=args.class_num )
@@ -397,14 +400,14 @@ def train_model(args,version="parts"):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--model_type", type=str, default="seq", help="human20 / bot21")
+parser.add_argument("--model_type", type=str, default="human20", help="human20 / bot21")
 parser.add_argument("--epochs",  type=int, default=10)
 parser.add_argument("--batch_size",  type=int, default=128)
 parser.add_argument("--past_window_len",  type=int, default=16)
 parser.add_argument("--units",  type=int, default=64)
 parser.add_argument("--class_num",  type=int, default=0)
 parser.add_argument("--dropout_per",  type=int, default=0.3)
-parser.add_argument("--saved_models_folder",  type=str, default="/media/datadisk/imim/existential_crisis/latest_data/exp5/parts")
+parser.add_argument("--saved_models_folder",  type=str, default="saved_models")
 parser.add_argument("--validation_per",  type=int, default=0.20)
 parser.add_argument("--workers",  type=int, default=5)
 parser.add_argument("--load",  type=str, default="none")

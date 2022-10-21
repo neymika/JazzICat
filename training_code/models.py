@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras.callbacks import LambdaCallback, ModelCheckpoint
-from tensorflow.keras.layers import InputLayer, Input, Dense, TimeDistributed, LSTM, RepeatVector, Dropout, GRU, CuDNNLSTM, Activation
+from tensorflow.keras.layers import InputLayer, Input, Dense, TimeDistributed, LSTM, RepeatVector, Dropout, GRU, Activation
 from tensorflow.keras.models import Model, Sequential, load_model
 from tensorflow.keras import regularizers
 from tensorflow.keras.datasets import mnist
@@ -15,7 +15,7 @@ import os
 import sys
 import pickle
 
-import get_data as gd
+# import get_data as gd
 
 
 #sequential model for input_dim = 1 (melody - p0)
@@ -53,7 +53,7 @@ def model(max_len,feature_rows,class_num,units):
     # dense_layer = Dense(feature_rows, activation = "relu")
     # lstm_layer = CuDNNLSTM(units)
     # y_out = Dense(class_num, activation = "softmax")
-    
+
     # model.add(in_layer)
     # model.add(dense_layer)
     # model.add(lstm_layer)
@@ -73,7 +73,7 @@ def model(max_len,feature_rows,class_num,units):
     # model.add(Dense(class_num, activation = "softmax"))
 
 
-    
+
 
     model.add(Dense(feature_rows, activation = "relu",input_shape=(max_len, feature_rows)))
     # model.add(CuDNNLSTM(units, return_sequences=True))
@@ -109,7 +109,7 @@ def model_bot(past_window_size,feature_rows,class_num,units):
     # model.add(Dense(class_num, kernel_initializer='he_normal', bias_initializer='he_normal', activation = "softmax"))
 
     # model.add(LSTM(units))
-    
+
     optimizer = Adam(lr=0.0001)
     model.compile(optimizer = optimizer, loss = 'categorical_crossentropy', metrics=['accuracy'])
 
@@ -140,5 +140,3 @@ def model_testin(past_window_size,feature_rows,class_num,units):
     model.summary
 
     return model
-
-
