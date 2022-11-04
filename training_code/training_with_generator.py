@@ -379,7 +379,7 @@ def train_model(args,version="parts"):
 
 
 
-    model_path = args.saved_models_folder + os.sep + version + "_model_"+args.model_type+"_"+str(args.past_window_len)+"len_ep{epoch:02d}-acc{val_acc:.4f}-loss{val_loss:.4f}-units"+str(args.units)+"_prevEp"+str(epochs_so_far)+".h5"
+    model_path = args.saved_models_folder + os.sep + version + "_model_"+args.model_type+"_"+str(args.past_window_len)+"len_ep{epoch:02d}-loss{val_loss:.4f}-units"+str(args.units)+"_prevEp"+str(epochs_so_far)+".h5"
 
     print_callback = ModelCheckpoint(model_path, monitor='val_loss', save_best_only=True )
 
@@ -391,7 +391,7 @@ def train_model(args,version="parts"):
     validation_generator = DataGenerator(ids_for_validation, model_type=args.model_type, dim=(args.past_window_len, feature_rows), n_classes=args.class_num)
 
     # model.fit(train_x, train_y, epochs=args.epochs, batch_size=args.batch_size, shuffle=True, validation_data=(test_x, test_y),callbacks=[print_callback])
-    model.fit_generator(training_generator, epochs=args.epochs, validation_data=validation_generator, callbacks=[print_callback,tensorboard], use_multiprocessing=True, workers=args.workers)
+    model.fit_generator(training_generator, epochs=args.epochs, validation_data=validation_generator, callbacks=[print_callback,tensorboard], use_multiprocessing=False, workers=args.workers)
 
     # model.fit_generator(training_generator, epochs=args.epochs, validation_data=validation_generator, callbacks=[print_callback])
 

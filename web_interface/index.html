@@ -6,13 +6,13 @@
 		<meta charset=utf-8>
 		<title>IM^2 MIDI Interface</title>
 		<style>
-			body { 
-				margin: 0;  
-				width: 100%; 
-				height: 100%; 
+			body {
+				margin: 0;
+				width: 100%;
+				height: 100%;
 				text-align: center;
 				font-family: 'Noto Serif', serif;
-				background: #5cdb95; 
+				background: #5cdb95;
 			}
 
 			.pixi_container{
@@ -159,7 +159,7 @@ input:checked + .slider:before {
 			}
 
 
-			
+
 
 			.keys {
 				display: block;
@@ -297,7 +297,7 @@ input:checked + .slider:before {
 			}
 
 
-			
+
 		</style>
 
 
@@ -311,7 +311,7 @@ input:checked + .slider:before {
 		<script src="scripts/midiService.js"></script>
 		<script src="scripts/midiCanvas.js"></script>
 		<script src="scripts/midiKeyboard.js"></script>
-		
+
 
 
 		<script src="scripts/custom_div.js"></script>
@@ -326,11 +326,11 @@ input:checked + .slider:before {
 		<script src="scripts/metronome_js/audioSources.js"></script>
 		<script src="scripts/metronome_js/metronome.js"></script>
 		<script src="scripts/metronome_js/metronome_main.js"></script>
-		
+
 	</head>
 
 	<body>
-	
+
 		<!-- <div id="pixi_container" style="width: 100vmin"></div> -->
 		<div class="pixi_container" id="pixi_container" style="width: 800px;"></div>
 
@@ -350,7 +350,7 @@ input:checked + .slider:before {
 
 			<div class="octave">
 					<div data-key="188" class="btn" data-note="-">
-						<span class="oct_hints"><</span> 
+						<span class="oct_hints"><</span>
 					</div>
 					<div data-key="190" class="btn" data-note="+">
 						<span class="oct_hints">></span>
@@ -439,8 +439,8 @@ input:checked + .slider:before {
 
 			// tfjs model loading
 			// var path_bot = "/tf_models/tfjs_models/exp5_model_bot21_16len_ep04-acc0.2793/model.json";
-			// var path_hum = "/tf_models/tfjs_models/exp5_model_human20_16len_ep05-acc0.3639/model.json";	
-		
+			// var path_hum = "/tf_models/tfjs_models/exp5_model_human20_16len_ep05-acc0.3639/model.json";
+
 			// 	// https://deeplizard.com/learn/video/nnxJyxtIuFM
 			// 	// https://medium.com/@rossbulat/tensorflow-js-working-withtensors-and-training-a-model-f153d0d53ad0
 			// 	// https://codelabs.developers.google.com/codelabs/tfjs-training-regression/index.html#6
@@ -450,7 +450,7 @@ input:checked + .slider:before {
 
 
 			var dict = [];
-			
+
 			// Before Revision Bot and human  model
 			// var path_bot = "/tf_models/tfjs_models/bot/model.json";
 			// var path_hum = "/tf_models/tfjs_models/human/model.json";
@@ -477,7 +477,7 @@ input:checked + .slider:before {
 			//     console.log("json:",count); // this will show the info it in firebug console
 			//     tSystem = new tensorflowSystem(path_hum, path_bot, dict);
 			// });
-			
+
 
 			// Dict after revision
 			$.getJSON("/tf_models/dicts/revision/parts_harmony_int2chord_dict.json", (json) => {
@@ -498,10 +498,10 @@ input:checked + .slider:before {
 
 
 
-			
 
-			
-			
+
+
+
 			// MIDI.js code
 
 			// load grand piano soundfont
@@ -516,14 +516,14 @@ input:checked + .slider:before {
 					var note = 50; // the MIDI note
 					var velocity = 1; // how hard the note hits
 					// play the note
-					// MIDI.setVolume(0, 1);
-					// MIDI.noteOn(0, note, velocity, delay);
-					// MIDI.noteOff(0, note, delay + 0.75);
+					MIDI.setVolume(0, 1);
+					MIDI.noteOn(0, note, velocity, delay);
+					MIDI.noteOff(0, note, delay + 0.75);
 				}
 			});
 
 
-			
+
 			var muteBtn = document.getElementById("mute_btn");
 
 			var muteMetroBtn = document.getElementById("mute_metro_btn");
@@ -531,22 +531,22 @@ input:checked + .slider:before {
 			muteMetroBtn.addEventListener( 'change', function() {
 			    if(this.checked) {
 			    	metronome.setSoundOnOff(true);
-			        
+
 			    } else {
 			    	metronome.setSoundOnOff(false);
 			    }
 			});
 
 
-			
+
 
 			// Init midi service
 			var midi = new midiService(100,muteBtn);
-			
+
 			var mcanvas = new midiCanvas(midi,150,800);
-			
+
 			var keyboard = new midiKeyboard(midi);
-			
+
 			// mcanvas.init();
 
 			$(document).ready( () =>{
@@ -608,7 +608,7 @@ input:checked + .slider:before {
 				construct_bars_content();
 				chart_object = new ChartClass( allBars );
 				tmp_beat = chart_object.chord_events[ 0 ];
-				
+
 
 
 				// // Run visualizer
@@ -641,7 +641,7 @@ input:checked + .slider:before {
 		</script>
 
 
-		
+
 	</body>
 
 

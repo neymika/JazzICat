@@ -51,8 +51,8 @@ function playBot(){
 
         console.log("notes",noteToPlay);
 
-        // MIDI.noteOn(channel, note, velocity, delay);
-        // MIDI.noteOff(channel, note, delay);
+        MIDI.noteOn(channel, note, velocity, delay);
+        MIDI.noteOff(channel, note, delay);
         // MIDI.chordOn(channel, [note, note, note], velocity, delay);
         // MIDI.chordOff(channel, [note, note, note], delay);
 
@@ -60,7 +60,7 @@ function playBot(){
         	MIDI.chordOn(0, noteToPlay, 127, 0);
         	MIDI.chordOff(0, noteToPlay, 0.08);
         }
-        
+
     }
 
     else console.log("SAME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -73,11 +73,11 @@ function make_inputs_and_run(midi){
     playBot();
 
 
-    // make beat info, stored in 
+    // make beat info, stored in
     // beat_info_array
     update_beat_info();
 
-    // make chord info, stored in 
+    // make chord info, stored in
     // chord_info_matrix
     update_chord_info();
 
@@ -85,10 +85,10 @@ function make_inputs_and_run(midi){
     // TODO: don't forget to fetch the note/chord translation dictionaries from python!!!
     // update human/midi input, stored in
     // human_midi_array
-    // console.log(midi)
+    console.log(midi)
     update_human_info(midi);
 
-    // update human prediction, stored in 
+    // update human prediction, stored in
     // human_prediction_array - need to run the human part of the system
     update_human_prediction();
 
@@ -106,7 +106,7 @@ function make_inputs_and_run_play(callbackFunction){
 	beforePlay = true;
 
 
-	
+
 	var bars_number_selector = document.getElementById("bars_number_selector");
 
 	var bars = parseInt(bars_number_selector.options[ bars_number_selector.selectedIndex ].text)
@@ -126,18 +126,18 @@ function make_inputs_and_run_play(callbackFunction){
         playNextEighth();
 
 
-		// make beat info, stored in 
+		// make beat info, stored in
 	    // beat_info_array
 	    // update_beat_info();
 
 	    // console.log()
-	    
-	    // make chord info, stored in 
+
+	    // make chord info, stored in
 	    // chord_info_matrix
 	    // update_chord_info();
 
 
-	    // update human prediction, stored in 
+	    // update human prediction, stored in
 	    // human_prediction_array - need to run the human part of the system
 	    // update_human_prediction();
 
@@ -178,13 +178,13 @@ function make_inputs_and_run_play(callbackFunction){
 }
 
 function make_inputs_and_run_init(){
-		// make beat info, stored in 
+		// make beat info, stored in
     // beat_info_array
     update_beat_info();
 
     console.log()
-    
-    // make chord info, stored in 
+
+    // make chord info, stored in
     // chord_info_matrix
     update_chord_info();
 
@@ -195,7 +195,7 @@ function make_inputs_and_run_init(){
     // console.log(midi)
     // update_human_info(midi);
 
-    // update human prediction, stored in 
+    // update human prediction, stored in
     // human_prediction_array - need to run the human part of the system
     update_human_prediction();
 
@@ -304,14 +304,14 @@ function update_human_prediction(){
 
         // console.log("human pred 2 max",maxNotePred);
         // console.log("human pred 3 argMax",maxNoteIndex);
-        
+
     }
 
     human_prediction_array.shift();
     human_prediction_array.push(maxNoteIndex[0]);
 
     // console.log('running update_human_prediction:',human_prediction_array);
-    
+
 }
 
 function update_bot_prediction(){
@@ -331,7 +331,7 @@ function update_bot_prediction(){
     var human_midi_array_copy = JSON.parse(JSON.stringify(human_midi_array));
 
     // console.log("human_midi_array", human_midi_array);
-    
+
     // human_midi_array_copy[human_midi_array_copy.length-1] = lastHumanPred;
 
     human_midi_array_copy.shift();
@@ -339,9 +339,9 @@ function update_bot_prediction(){
 
 
     // console.log("human_midi_array_copy", human_midi_array_copy);
-    
+
     // input.push(beat_info_array);
-    
+
     // input.push(human_midi_array); human_midi_array_copy.shift() human_midi_array_copy.push(lastHumanPred)
     // bot_prediction_array
 
@@ -357,14 +357,14 @@ function update_bot_prediction(){
     }
 
     // console.log("input:",input);
-    
+
 
     var transposedArray = input[0].map((col, i) => input.map(row => row[i]));
 
 
     var input_tensor = tf.tensor(transposedArray);
     input_tensor = input_tensor.reshape([-1,16,21]);
-    
+
     // input_tensor.print();
 
     if (tSystem.model_bot != "bot"){
@@ -378,7 +378,7 @@ function update_bot_prediction(){
 
         // console.log("human pred 2 max",maxNotePred);
         // console.log("bot pred argMax",maxNoteIndex);
-        
+
     }
 
     bot_prediction_array.shift();

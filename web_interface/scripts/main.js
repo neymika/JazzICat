@@ -60,10 +60,10 @@ function construct_controls_UI(){
         option.text = bar_number_options[i];
         bars_number_selector.appendChild(option);
     }
-    
+
     bars_number_selector.onchange = function(){
 
-    	
+
         num_of_bar_quadruples = bars_number_selector.value;
         construct_bars_UI();
         construct_bars_content();
@@ -206,7 +206,7 @@ function construct_controls_UI(){
             // run tensorflow
             make_inputs_and_run_play(play_metronome);
             // play_metronome();
-            
+
             // metronome.toolSendsPlayStop( play_status );
             // metronome.setSoundOnOff( play_status );
             // // var tmp_beat = chart_object.chord_events[ beat_highlight ];
@@ -303,7 +303,7 @@ function stop_metronome(){
     eighth_value = 0;
     tmp_beat = chart_object.chord_events[ beat_highlight ];
     document.getElementById('playstop_button').innerHTML = "Play";
-    
+
     // tmp_beat = chart_object.chord_events[ beat_highlight ];
 
 
